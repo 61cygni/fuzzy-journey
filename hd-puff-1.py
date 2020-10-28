@@ -4,6 +4,8 @@ import math
 import time
 import random
 
+from pygame import mixer
+
 # 2D Guass funxction from https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
 # A - Amplitude
 # xo, yo - the center
@@ -114,6 +116,10 @@ def run_demos(width, height, fps):
         puffs = []
         locs  = []
 
+        mixer.init()
+        mixer.music.load("lofi.mp3")
+        mixer.music.set_volume(0.7)
+
         for i in range(0,100):
             size = int(random.random()*200) 
             puffs.append(Puff(size, size, screen))
@@ -121,6 +127,9 @@ def run_demos(width, height, fps):
         for i in range(0,100):
             size = int(random.random()*20) 
             puffs.append(Puff(size, size, screen))
+
+        # Start playing the song
+        mixer.music.play()
 
         while True:
                 for event in pygame.event.get():

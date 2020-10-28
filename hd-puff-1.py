@@ -110,7 +110,6 @@ def run_demos(width, height, fps):
         screen = pygame.display.set_mode((width, height))
         background = create_background(width, height)
         clock = pygame.time.Clock()
-        the_world_is_a_happy_place = 0
 
         puffs = []
         locs  = []
@@ -124,7 +123,6 @@ def run_demos(width, height, fps):
             puffs.append(Puff(size, size, screen))
 
         while True:
-                the_world_is_a_happy_place += 1
                 for event in pygame.event.get():
                         if is_trying_to_quit(event):
                                 return

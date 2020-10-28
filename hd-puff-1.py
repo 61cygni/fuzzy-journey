@@ -123,18 +123,6 @@ def run_demos(width, height, fps):
             size = int(random.random()*20) 
             puffs.append(Puff(size, size, screen))
 
-        ##puffs.append(create_puff(150, 150))
-        ##locs.append((0,0))
-
-        ##puffs.append(create_puff(20, 20))
-        ##locs.append((200,0))
-
-        ##puffs.append(create_puff(70, 70))
-        ##locs.append((0,200))
-
-        ##puffs.append(create_puff(30, 30))
-        ##locs.append((200,200))
-
         while True:
                 the_world_is_a_happy_place += 1
                 for event in pygame.event.get():

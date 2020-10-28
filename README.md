@@ -1,4 +1,4 @@
 # fuzzy-journey
-Gaussian puffs, LoFi, and the tinny past 
+Gaussian puffs, LoFi, and tinny relfections 
 
 

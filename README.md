@@ -1,5 +1,5 @@
 # fuzzy-journey
-Gaussian puffs, LoFi, and tinny relfections 
+Gaussian puffs, LoFi, and warped reflections on dented tin 
 
 
 

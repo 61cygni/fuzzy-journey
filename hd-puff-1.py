@@ -6,10 +6,11 @@ import random
 
 from pygame import mixer
 
-# 2D Guass funxction from https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
+# 2D Gauss function from https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
 # A - Amplitude
 # xo, yo - the center
 # sigx, sigy - x and y spreads of the blob
+
 def my_gauss2d(x, y, A, xo, yo, sigx, sigy): 
   x_num = math.pow((x - xo), 2)
   y_num = math.pow((y - yo), 2)
@@ -71,11 +72,6 @@ class Puff:
         self.x += self.xinc
         self.y += self.yinc
 
-        #print ("%d %d" % (self.x, self.y))
-
-
-def my_gauss(a, b, c, x):
-  return a * math.exp(- (math.pow((x-b), 2) / (2 * math.pow(c, 2))))
 
 
 def create_background(width, height):
@@ -113,6 +109,8 @@ def run_demos(width, height, fps):
         background = create_background(width, height)
         clock = pygame.time.Clock()
 
+        music_bool = True
+
         puffs = []
         locs  = []
 
@@ -120,13 +118,17 @@ def run_demos(width, height, fps):
         mixer.music.load("lofi.mp3")
         mixer.music.set_volume(0.7)
 
-        for i in range(0,100):
+        # generate initial puff list
+
+        for i in range(0,50):
             size = int(random.random()*200) 
             puffs.append(Puff(size, size, screen))
 
-        for i in range(0,100):
+        for i in range(0,50):
             size = int(random.random()*20) 
             puffs.append(Puff(size, size, screen))
+
+        random.shuffle(puffs)    
 
         # Start playing the song
         mixer.music.play()
@@ -134,9 +136,21 @@ def run_demos(width, height, fps):
         while True:
                 for event in pygame.event.get():
                         if is_trying_to_quit(event):
-                                return
-                        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                                demos = demos[1:]
+                            return
+                        if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                            music_bool = not music_bool 
+                            if not music_bool:
+                                mixer.music.set_volume(0.0)
+                            else:
+                                mixer.music.set_volume(0.7)
+                        elif event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+                            size = int(random.random()*200) 
+                            puffs.append(Puff(size, size, screen))
+                            size = int(random.random()*20) 
+                            puffs.append(Puff(size, size, screen))
+                        elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                            puffs.pop(0)
+                            
                 screen.blit(background, (0, 0))
                 for puff in puffs:
                     do_gauss_demo(screen, puff)

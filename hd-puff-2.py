@@ -1,10 +1,20 @@
-# Experiment with high resolution 
+# 
+# Displays a picture of smiling indian soldiers, and then overlays with
+# moving circles that expose a picture below of a pile of bodies.
+#
+# Unfortunately, the currently implementation is pretty slow limiting
+# the size of the circles and the number that can move around. This is
+# largely due to the alpha channel. 
+#
+#
 import pygame
 import math
 import time
 import random
 
 from pygame import mixer
+from pygame import gfxdraw
+
 
 # 2D Gauss function from https://en.wikipedia.org/wiki/Gaussian_function#Two-dimensional_Gaussian_function
 # A - Amplitude
@@ -29,8 +39,10 @@ def create_puff(width, height):
 
   for x in range(0, width):
     for y in range(0, height):
-      opacity = my_gauss2d(x, y, 1, xo, yo, sigx, sigy)
+      opacity = my_gauss2d(x, y, 2, xo, yo, sigx, sigy)
       alpha = (255*opacity)
+      if alpha > 255 : 
+        alpha = 255
 
       puff.set_at((x, y), (255, 255, 255, alpha))
 
@@ -44,8 +56,8 @@ class Puff:
       self.w = width
       self.h = height
 
-      self.xinc = random.choice([ -2, -1, -1, 1,  1, 2]) 
-      self.yinc = random.choice([ -2, -1, -1, 1,  1, 2]) 
+      self.xinc = random.choice([  -3,  3 ]) 
+      self.yinc = random.choice([  -3,  3 ]) 
 
       self.surface = surface
 
@@ -55,24 +67,29 @@ class Puff:
 
 
     def init_pos(self):
-      self.x = int(self.surface.get_width () * random.random())
-      self.y = int(self.surface.get_height() * random.random())
+      self.x = int((self.surface.get_width () - self.w) * random.random())
+      self.y = int((self.surface.get_height() - self.h) * random.random())
 
     def move_pos(self):
-        if self.x >= (self.surface.get_width() - self.w):
-            self.xinc *= -1 
-        elif self.x <= 0:
-            self.xinc *= -1 
 
-        if self.y >= (self.surface.get_height() - self.h):
-            self.yinc *= -1 
-        elif self.y <= 0:
-            self.yinc *= -1 
+        if self.x + 3 >= (self.surface.get_width() - self.w):
+            self.xinc = -3 
+
+        if self.x <= 3:
+            self.xinc =  3 
+            self.x = 3
+
+        if self.y + 3 >= (self.surface.get_height() - self.h):
+            self.yinc = -3 
+
+        if self.y <= 3:
+            self.yinc = 3 
+            self.y = 3 
 
         self.x += self.xinc
         self.y += self.yinc
 
-
+        #print("POS %d %d" % (self.x, self.y))
 
 def create_background(width, height):
     image = pygame.image.load("indiantroops.jpg")
@@ -92,10 +109,18 @@ def is_trying_to_quit(event):
         return x_button or altF4 or escape
 
   
-def do_gauss_demo(surface, puff):
-        
-        # Draw a rectangle
-        surface.blit(puff.puff, (puff.x, puff.y))
+def do_gauss_demo(surface, darkbg, puff):
+
+        subsurface = darkbg.subsurface(puff.x, puff.y, puff.w, puff.h)
+
+        for x in range(0, puff.w):
+            for y in range(0, puff.h):
+                alpha = puff.puff.get_at((x,y))[3]
+                pixel = subsurface.get_at((x,y))
+                pixel[3] = alpha 
+                subsurface.set_at((x,y), pixel)
+
+        surface.blit(subsurface, (puff.x, puff.y))               
 
 
 def run_demos(width, height, fps):
@@ -111,18 +136,22 @@ def run_demos(width, height, fps):
 
         mixer.init()
         mixer.music.load("lofi.mp3")
-        mixer.music.set_volume(0.4)
+        mixer.music.set_volume(0.0)
 
         # generate initial puff list
 
-        for i in range(0,10):
-            size = int(random.random()*200) 
+        for i in range(0,4):
+            #size = int(random.random()*200) + 200 
+            size = 250 
             puffs.append(Puff(size, size, screen))
 
         random.shuffle(puffs)    
 
         # Start playing the song
         mixer.music.play()
+
+        darkbg = pygame.image.load("bodies.jpg")
+        darkbg = darkbg.convert_alpha()
 
         while True:
                 for event in pygame.event.get():
@@ -144,7 +173,7 @@ def run_demos(width, height, fps):
                             
                 screen.blit(background, (0, 0))
                 for puff in puffs:
-                    do_gauss_demo(screen, puff)
+                    do_gauss_demo(screen, darkbg, puff)
                     puff.move_pos()
                 pygame.display.flip()
                 clock.tick(fps)

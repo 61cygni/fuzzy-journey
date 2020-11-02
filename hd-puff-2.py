@@ -136,7 +136,7 @@ def run_demos(width, height, fps):
 
         mixer.init()
         mixer.music.load("LoFi-loop.mp3")
-        mixer.music.set_volume(0.0)
+        mixer.music.set_volume(0.4)
 
         # generate initial puff list
 
